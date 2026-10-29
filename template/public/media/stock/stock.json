@@ -1,0 +1,84 @@
+[
+ {
+  "file": "coverr_evening_coast.mp4",
+  "url": null,
+  "source": "Coverr · evening-city-landscape",
+  "page": "https://coverr.co/videos/evening-city-landscape",
+  "license": "Coverr Free Commercial",
+  "note": "S01 背景（海岸黄昏航拍）。Coverr 无稳定直链：自动改下 Mixkit #42349 同名保存；想要原片请到页面手动下载覆盖",
+  "fallback": "https://assets.mixkit.co/videos/42349/42349-1080.mp4"
+ },
+ {
+  "file": "coverr_sunset_towers.mp4",
+  "url": null,
+  "source": "Coverr · skyscrapers-in-buenos-aires",
+  "page": "https://coverr.co/videos/skyscrapers-in-buenos-aires",
+  "license": "Coverr Free Commercial",
+  "note": "S08 背景（夕阳高楼）。自动改下 Mixkit #42351 同名保存；原片请手动下载覆盖",
+  "fallback": "https://assets.mixkit.co/videos/42351/42351-1080.mp4"
+ },
+ {
+  "file": "mixkit_shanghai_river.mp4",
+  "url": "https://assets.mixkit.co/videos/20106/20106-720.mp4",
+  "source": "Mixkit #20106",
+  "page": "https://mixkit.co/free-stock-video/20106/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "S02 背景 1280×720"
+ },
+ {
+  "file": "mixkit_hk_illuminated.mp4",
+  "url": "https://assets.mixkit.co/videos/30959/30959-720.mp4",
+  "source": "Mixkit #30959",
+  "page": "https://mixkit.co/free-stock-video/30959/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "S03 背景 1280×720"
+ },
+ {
+  "file": "mixkit_city_night_aerial_river.mp4",
+  "url": "https://assets.mixkit.co/videos/42353/42353-1080.mp4",
+  "source": "Mixkit #42353",
+  "page": "https://mixkit.co/free-stock-video/42353/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "S04 背景"
+ },
+ {
+  "file": "mixkit_city_night_approach.mp4",
+  "url": "https://assets.mixkit.co/videos/42350/42350-1080.mp4",
+  "source": "Mixkit #42350",
+  "page": "https://mixkit.co/free-stock-video/42350/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "S05 背景"
+ },
+ {
+  "file": "mixkit_guangzhou_pearl.mp4",
+  "url": "https://assets.mixkit.co/videos/31000/31000-720.mp4",
+  "source": "Mixkit #31000",
+  "page": "https://mixkit.co/free-stock-video/31000/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "S07 背景 1280×720"
+ },
+ {
+  "file": "mixkit_skyscraper_panorama.mp4",
+  "url": "https://assets.mixkit.co/videos/42355/42355-1080.mp4",
+  "source": "Mixkit #42355",
+  "page": "https://mixkit.co/free-stock-video/42355/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "S09 背景"
+ },
+ {
+  "file": "mixkit_city_night_skyscrapers.mp4",
+  "url": "https://assets.mixkit.co/videos/42342/42342-1080.mp4",
+  "source": "Mixkit #42342",
+  "page": "https://mixkit.co/free-stock-video/42342/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "镜内媒体框"
+ },
+ {
+  "file": "mixkit_guangzhou_lights.mp4",
+  "url": "https://assets.mixkit.co/videos/31098/31098-720.mp4",
+  "source": "Mixkit #31098",
+  "page": "https://mixkit.co/free-stock-video/31098/",
+  "license": "Mixkit Stock Video Free License",
+  "note": "镜内媒体框 1280×720"
+ }
+]

@@ -1,0 +1,28 @@
+{
+  "name": "xiaoteng-storyboard-style-4-5",
+  "private": true,
+  "type": "module",
+  "description": "小滕分镜风格4.5版本 · Remotion 模板",
+  "engines": {"node": ">=22.18.0"},
+  "scripts": {
+    "setup": "node scripts/install.mjs",
+    "stock": "node scripts/download-stock.mjs",
+    "check": "node --no-warnings scripts/check-layout.mjs",
+    "stills": "node --no-warnings scripts/stills.mjs",
+    "render": "node scripts/render.mjs",
+    "studio": "node scripts/render.mjs --studio"
+  },
+  "dependencies": {
+    "remotion": "4.0.484",
+    "@remotion/cli": "4.0.484",
+    "@remotion/renderer": "4.0.484",
+    "@remotion/bundler": "4.0.484",
+    "react": "19.2.7",
+    "react-dom": "19.2.7"
+  },
+  "devDependencies": {
+    "typescript": "6.0.3",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3"
+  }
+}
