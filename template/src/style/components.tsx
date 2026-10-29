@@ -56,9 +56,11 @@ export const GlassCard: React.FC<{r: Rect; start: number; tone?: Tone; from?: En
 
 /** 真实帧上下文：镜头末尾定格时，前景冻结，但视频（背景/媒体框）继续播放，避免「顿一下」 */
 export const LiveFrameCtx = React.createContext<number | null>(null);
+/** 素材比镜头短时的慢放倍率（0.75–1），由 Demo 按镜头时长与素材时长计算 */
+export const ClipRateCtx = React.createContext<Record<string, number>>({});
 export const LiveVideo: React.FC<{src: string; style: React.CSSProperties; trimStart?: number}> = ({src, style, trimStart = 0}) => {
-  const live = React.useContext(LiveFrameCtx);
-  const v = <OffthreadVideo src={staticFile(src)} style={style} muted startFrom={Math.round(trimStart * 30)} />;
+  const live = React.useContext(LiveFrameCtx); const rate = React.useContext(ClipRateCtx)[src] ?? 1;
+  const v = <OffthreadVideo src={staticFile(src)} style={style} muted playbackRate={rate} startFrom={Math.round(trimStart * 30)} />;
   return live == null ? v : <Freeze frame={live}>{v}</Freeze>;
 };
 

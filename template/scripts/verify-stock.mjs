@@ -32,9 +32,13 @@ const probe = (f) => {
 
 // 素材 → 用到它的镜头
 const {SHOTS} = await import(pathToFileURL(join(ROOT, 'src', 'demo', 'shots.ts')).href);
+const {buildTimeline} = await import(pathToFileURL(join(ROOT, 'src', 'sync', 'timeline.ts')).href);
+const {ensureEpisode} = await import(pathToFileURL(join(ROOT, 'scripts', 'episode.mjs')).href);
+const TL = buildTimeline(SHOTS, ensureEpisode());
 const uses = new Map();
-const add = (m, s) => { if (m?.video && m.src) { const k = basename(m.src); uses.set(k, [...(uses.get(k) || []), {id: s.id, need: (m.trim || 0) + s.sec + 0.5}]); } };
-for (const s of SHOTS) { add(s.bg, s); const d = s.data || {}; [d.media, d.L?.media, d.R?.media].forEach((m) => add(m, s)); }
+// 镜长来自字幕时间码；素材不够长时最多慢放到 0.75×，所以最低要求 = trim + 0.75 × (镜长 + 转场延续)
+const add = (m, s, d) => { if (m?.video && m.src) { const k = basename(m.src); uses.set(k, [...(uses.get(k) || []), {id: s.id, need: (m.trim || 0) + 0.75 * (d + 14) / 30 + 0.1}]); } };
+for (const {s, d} of TL.items) { add(s.bg, s, d); const x = s.data || {}; [x.media, x.L?.media, x.R?.media].forEach((m) => add(m, s, d)); }
 
 const demo = new Set(); try { JSON.parse(readFileSync(join(STOCK, 'stock.json'), 'utf8')).forEach((e) => demo.add(e.file)); } catch {}
 const sources = existsSync(join(STOCK, 'SOURCES.md')) ? readFileSync(join(STOCK, 'SOURCES.md'), 'utf8') : '';

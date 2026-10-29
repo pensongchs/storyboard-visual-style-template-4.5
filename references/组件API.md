@@ -7,7 +7,9 @@
 |---|---|---|
 | `Fonts` | 注册阿里巴巴普惠体 Black（标题）、阿里健康体（正文）、Arial Bold（数字） | — |
 | `Backdrop` | 背景（视频或图片）：提亮、压暗、上下渐变压暗；静图会缓慢推近 | `src video blur dark trimStart` |
-| `LiveVideo` / `LiveFrameCtx` | 不受镜头末尾定格影响、一直播放的视频（防顿帧的核心） | `src style trimStart` |
+| `LiveVideo` / `LiveFrameCtx` | 不受镜头末尾定格影响、一直播放的视频（防顿帧的核心）；素材不够长时按 `ClipRateCtx` 慢放 | `src style trimStart` |
+| `Subtitles` | 烧录字幕（磨砂胶囊 + 当前词高亮），读 episode.json | `ep opts={show,highlight}` |
+| `AnchorCtx` | 本镜动效锚点（帧），版式里用来决定元素入场时刻 | — |
 | `Kicker` | 左上角栏目行（短金线加文字） | `text` |
 | `Headline` | 标题行，`{…}` 部分为金色 | `text start` |
 | `GoldText` | 把行内 `{…}` 渲染成金色 | `text` |

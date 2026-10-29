@@ -1,4 +1,5 @@
 import {SHOTS} from '../src/demo/shots.ts';
-let t = 0; const out = [];
-for (const s of SHOTS) { const d = Math.ceil(s.sec * 30); out.push(`${s.id}:${t + d - 1}`); t += d; }
-console.log(out.join(' '));
+import {buildTimeline} from '../src/sync/timeline.ts';
+import {ensureEpisode} from './episode.mjs';
+const TL = buildTimeline(SHOTS, ensureEpisode());
+console.log(TL.items.map(({s, from, d}) => `${s.id}:${from + d - 1}`).join(' '));

@@ -22,7 +22,7 @@ export const DomCheck: React.FC<{id: string; zones: Record<string, Rect>}> = ({i
       const errs: string[] = []; const seenBlocks = new Set<Element>();
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT); let n: Node | null;
       while ((n = w.nextNode())) {
-        const txt = n.textContent?.trim(); if (!txt) continue; const el = n.parentElement!; if (el.closest('style,script,[data-deco]')) continue;
+        const txt = n.textContent?.trim(); if (!txt) continue; const el = n.parentElement!; if (el.closest('style,script,[data-deco],[data-sub]')) continue;
         const cs = getComputedStyle(el); const fs = parseFloat(cs.fontSize);
         const body = !!el.closest('[data-role="body"]');
         if (fs < MIN_FONT.any - 0.5) errs.push(`字号过小 ${fs}px「${txt.slice(0, 12)}」`);

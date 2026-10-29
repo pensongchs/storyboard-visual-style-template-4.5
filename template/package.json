@@ -8,6 +8,7 @@
   },
   "scripts": {
     "setup": "node scripts/install.mjs",
+    "episode": "node scripts/episode.mjs",
     "stock": "node scripts/download-stock.mjs",
     "stock:verify": "node --no-warnings scripts/verify-stock.mjs",
     "check": "node --no-warnings scripts/check-layout.mjs",

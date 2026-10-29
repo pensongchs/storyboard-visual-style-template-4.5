@@ -4,3 +4,7 @@
 - **视频素材**：来自 Mixkit（Mixkit Stock Video Free License）和 Coverr（Coverr License），均可免费商用、不需要署名。仓库里不包含视频文件，运行 `npm run stock` 会按 `template/public/media/stock/stock.json` 下载，来源见同目录下的 SOURCES.md。其中两个原本来自 Coverr 的镜头没有稳定的直链，所以用同类的 Mixkit 素材替代，文件名保持不变。
 - **概念图**：`template/public/media/gen` 里的图片是 AI 生成的示意图，只作为示例。
 - **代码**：模板代码可以自由修改和复用。Remotion 有自己的许可证（公司达到一定规模需要购买商用许可），见 https://remotion.dev/license 。
+
+
+## 示例口播音频
+`template/episodes/demo/audio.m4a` 是用 Microsoft Edge 在线语音合成（edge-tts，zh-CN-YunxiNeural）生成的演示口播，仅供模板演示和测试；字幕由 whisper.cpp 识别后人工校对。正式出片请使用学员自己的口播。
