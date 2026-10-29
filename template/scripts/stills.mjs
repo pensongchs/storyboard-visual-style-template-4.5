@@ -1,19 +1,26 @@
-// 检查 + 每镜定格帧 + 联系表（不依赖 bash / python）
+// 检查 + 每镜定格帧 + 联系表（纯 Node，不依赖 bash / python / 系统 ffmpeg）
 //   npm run stills   → out/stills/S01.png… 与 out/联系表.png
-import {readdirSync} from 'node:fs';
+import {readdirSync, mkdirSync, copyFileSync, rmSync} from 'node:fs';
 import {join} from 'node:path';
 import {spawnSync} from 'node:child_process';
-import {ROOT, remotionCli} from './_util.mjs';
-const r = spawnSync(process.execPath, ['--no-warnings', join(ROOT, 'scripts', 'check-layout.mjs'), '--dom'], {cwd: ROOT, stdio: 'inherit'});
-const shots = readdirSync(join(ROOT, 'out', 'stills')).filter((f) => /^S\d+\.png$/.test(f)).sort();
+import {ROOT} from './_util.mjs';
+process.chdir(ROOT);
+const r = spawnSync(process.execPath, ['--no-warnings', join('scripts', 'check-layout.mjs'), '--dom'], {stdio: 'inherit'});
+const shots = readdirSync(join('out', 'stills')).filter((f) => /^S\d+\.png$/.test(f)).sort();
 if (shots.length) {
-  const rows = Math.ceil(shots.length / 2);
-  const inputs = shots.flatMap((f) => ['-i', join('out', 'stills', f)]);
-  const scaled = shots.map((_, i) => `[${i}:v]scale=640:360[v${i}]`).join(';');
-  const layout = shots.map((_, i) => `${16 + (i % 2) * 656}_${16 + Math.floor(i / 2) * 376}`).join('|');
-  const fc = `${scaled};${shots.map((_, i) => `[v${i}]`).join('')}xstack=inputs=${shots.length}:layout=${layout}:fill=0x121110,pad=${2 * 656 + 16}:${rows * 376 + 16}:color=0x121110`;
-  const singleFix = shots.length === 1 ? ['-vf', 'pad=672:392:16:16:color=0x121110'] : ['-filter_complex', fc];
-  remotionCli(['ffmpeg', '-v', 'error', '-y', ...inputs, ...singleFix, '-frames:v', '1', join('out', '联系表.png')]);
-  console.log(`✓ out/联系表.png（${shots.length} 镜，按 S01→ 从左到右、从上到下）`);
+  const tmp = join('public', '_contact');
+  rmSync(tmp, {recursive: true, force: true}); mkdirSync(tmp, {recursive: true});
+  shots.forEach((f) => copyFileSync(join('out', 'stills', f), join(tmp, f)));
+  try {
+    const {bundle} = await import('@remotion/bundler');
+    const {selectComposition, renderStill} = await import('@remotion/renderer');
+    const B = process.env.REMOTION_BROWSER || null;
+    const serveUrl = await bundle({entryPoint: 'src/index.ts'});
+    const inputProps = {files: shots};
+    const composition = await selectComposition({serveUrl, id: 'ContactSheet', inputProps, browserExecutable: B});
+    await renderStill({serveUrl, composition, inputProps, output: join('out', '联系表.png'), browserExecutable: B});
+    console.log(`✓ out/联系表.png（${shots.length} 镜，按 S01→ 从左到右、从上到下）`);
+  } catch (e) { console.error('✗ 联系表生成失败：', e.message); process.exitCode = 1; }
+  finally { rmSync(tmp, {recursive: true, force: true}); }
 }
-process.exit(r.status ?? 0);
+if (r.status) process.exit(r.status);
