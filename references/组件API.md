@@ -37,20 +37,6 @@
 | `StatPill` | 数据胶囊卡（键、数字、说明），底色不透明 | `r start k value unit dec sep s hi from` |
 | `FillMeter` | 横向金条，和第二处大数字的下划线错开 | `start ratio label?` |
 
-## 新动画库（mg-library.tsx）
-镜头字段 `mg` 取下表 id，`mgSpec` 覆盖示例文案。同一种一期最多 2 次，相邻镜不能重复。
-
-| id | 组件 | 和旧组件的差别 |
-|---|---|---|
-| `flipCount` | `MgFlipCount` | 每一位从 0 滚到目标，不是整段数字一起变 |
-| `gauge` | `MgGauge` | 半圆刻度加指针，不是整圆环 |
-| `barChart` | `MgBarChart` | 多根柱子从基线长高 |
-| `lineChart` | `MgLineChart` | 折线按路径生长 |
-| `pinMap` | `MgPinMap` | 标记落下、波纹、再连线 |
-| `floorPlan` | `MgFloorPlan` | 墙线描出后房间名出现 |
-| `checkCross` | `MgCheckCross` | 对勾和叉号分别描出来 |
-| `typeLine` | `MgTypeLine` | 句子逐字出现，当前字沙金 |
-
 ## 检查标记（DOM 检查依赖这些属性，新写组件时也要加）
 - `data-role="body"`：正文或说明文字，字号必须 ≥34。
 - `data-fit="名字"` 加子元素 `data-fit-text`：容器里的文字宽度不能超过容器的 75%。

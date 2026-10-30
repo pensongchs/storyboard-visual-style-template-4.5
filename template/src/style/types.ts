@@ -14,9 +14,6 @@ export type Shot = {
   city?: string;
   /** 本镜主动画名。相邻镜不得相同，一期至少 6 种（check-layout 会查） */
   motion?: string;
-  /** 新动画库里的样式 id，见 mg-catalog.ts。同一种一期最多 2 次，相邻镜不能相同 */
-  mg?: string;
-  mgSpec?: Record<string, unknown>;
   bg: Media & {blur?: number; dark?: number};
   data: any;
 };
