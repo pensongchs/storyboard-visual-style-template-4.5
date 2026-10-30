@@ -1,10 +1,10 @@
 // 克制转场（8–15 帧，轮换使用）：crossfade / pushBlur / lightSweep / maskWipe
 import React from 'react';
 import {AbsoluteFill, interpolate, useCurrentFrame, Easing} from 'remotion';
-export type TKind = 'crossfade' | 'pushBlur' | 'lightSweep' | 'maskWipe';
+export type TKind = 'crossfade' | 'pushBlur' | 'lightSweep' | 'maskWipe' | 'goldCut';
 export type TSpec = {kind: TKind; dur: number};
 export const TRANSITIONS: TSpec[] = [
-  {kind: 'pushBlur', dur: 12}, {kind: 'crossfade', dur: 10}, {kind: 'maskWipe', dur: 14}, {kind: 'lightSweep', dur: 12},
+  {kind: 'pushBlur', dur: 12}, {kind: 'crossfade', dur: 10}, {kind: 'maskWipe', dur: 14}, {kind: 'lightSweep', dur: 12}, {kind: 'goldCut', dur: 11},
 ];
 const ease = Easing.bezier(0.45, 0, 0.2, 1);
 const P = (f: number, a: number, b: number) => interpolate(f, [a, b], [0, 1], {extrapolateLeft: 'clamp', extrapolateRight: 'clamp', easing: ease});
@@ -23,11 +23,15 @@ export const Transition: React.FC<{d: number; inT: TSpec | null; outT: TSpec | n
     if (inT.kind === 'lightSweep') { style = {...style, opacity: p};
       overlay = <AbsoluteFill style={{zIndex: z + 0.5, pointerEvents: 'none', opacity: 0.22 * Math.sin(Math.PI * p),
         background: `linear-gradient(105deg, transparent ${p * 120 - 40}%, rgba(255,240,215,0.9) ${p * 120 - 20}%, transparent ${p * 120}%)`}} />; }
+    if (inT.kind === 'goldCut') { style = {...style, clipPath: `inset(0 ${(1 - p) * 100}% 0 0)`};
+      overlay = <AbsoluteFill style={{zIndex: z + 0.5, pointerEvents: 'none'}}>
+        <div style={{position: 'absolute', top: 0, bottom: 0, left: `${p * 100}%`, width: 3, marginLeft: -2, background: 'linear-gradient(180deg,#FBE6BC,#D9B26F)', boxShadow: '0 0 16px rgba(217,178,111,0.85)'}} />
+      </AbsoluteFill>; }
   }
   if (outT && f >= d) {
     const p = P(f, d, d + outT.dur);
     if (outT.kind === 'pushBlur') style = {...style, transform: `translateX(${-p * 60}px)`, filter: `blur(${p * 8}px)`};
-    if (outT.kind === 'crossfade' || outT.kind === 'lightSweep') style = {...style, opacity: 1 - p * 0.3};
+    if (outT.kind === 'crossfade' || outT.kind === 'lightSweep' || outT.kind === 'goldCut') style = {...style, opacity: 1 - p * 0.3};
   }
   return <><AbsoluteFill style={style}>{children}</AbsoluteFill>{overlay}</>;
 };

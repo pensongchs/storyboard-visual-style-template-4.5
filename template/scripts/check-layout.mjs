@@ -6,7 +6,7 @@
 import {readFileSync, mkdirSync, rmSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {SAFE, GRID, ROWS, MG_GAP} from '../src/style/grid.ts';
+import {CANVAS, SAFE, GRID, ROWS, MG_GAP} from '../src/style/grid.ts';
 import {layoutRects, titleRect, usesTitle} from '../src/style/layouts.ts';
 import {TYPE, MIN_FONT} from '../src/style/tokens.ts';
 import {SHOTS} from '../src/demo/shots.ts';
@@ -39,10 +39,24 @@ for (const s of SHOTS) {
     if (Math.max(gx, gy) < need) errs.push(`${s.id}: ${ka} 与 ${kb} 间距 ${Math.max(gx, gy)}px < ${need}`);
   }
 }
-// 2) 素材不复用
+// 2) 素材不重复：背景和插画的视频、图片，同一 src 不得跨镜复用（换 trim 也不行）
 const seen = new Map(); const walk = (o, id) => { if (!o || typeof o !== 'object') return;
-  for (const [k, v] of Object.entries(o)) { if ((k === 'src' || k === 'character') && typeof v === 'string') { if (seen.has(v)) errs.push(`素材复用 ${v}: ${seen.get(v)} 与 ${id}`); else seen.set(v, id); } else walk(v, id); } };
+  for (const [k, v] of Object.entries(o)) { if ((k === 'src' || k === 'character') && typeof v === 'string') { if (seen.has(v)) errs.push(`${id}: 素材重复 ${v}（已用于 ${seen.get(v)}）。同一条片子里背景和插画不得复用`); else seen.set(v, id); } else walk(v, id); } };
 for (const s of SHOTS) walk(s, s.id);
+// 2b) 背景不糊；主动画相邻不重复、同版式至少隔 2 镜、一期至少 6 种主动画
+for (const s of SHOTS) {
+  const b = s.bg?.blur ?? 0;
+  if (b > 0) errs.push(`${s.id}: 背景不糊，${s.bg.video ? '视频' : '静图'} blur=${b} 应改为 0（靠压暗和前景底衬，不要糊整幅背景）`);
+  if (!s.motion) errs.push(`${s.id}: 缺少 motion（本镜主动画，相邻镜不得相同）`);
+}
+const lastLayout = new Map();
+SHOTS.forEach((s, i) => {
+  if (i && s.layout === SHOTS[i - 1].layout) errs.push(`${s.id}: 与上一镜同版式 ${s.layout}`);
+  if (i && s.motion && s.motion === SHOTS[i - 1].motion) errs.push(`${s.id}: 主动画 ${s.motion} 与上一镜重复`);
+  if (lastLayout.has(s.layout) && i - lastLayout.get(s.layout) < 3) errs.push(`${s.id}: 版式 ${s.layout} 与 ${SHOTS[lastLayout.get(s.layout)].id} 间隔不足 2 镜`);
+  lastLayout.set(s.layout, i);
+});
+if (new Set(SHOTS.map((s) => s.motion).filter(Boolean)).size < Math.min(6, SHOTS.length)) errs.push('主动画种类不足 6 种');
 // 3) 城市中性：除 city 字段外，所有屏幕文字不得出现城市名
 const CITIES = '长沙|北京|上海|广州|深圳|杭州|成都|重庆|武汉|南京|西安|天津|苏州|郑州|合肥|青岛|宁波|厦门|福州|济南|昆明|南昌|贵阳|南宁|长春|沈阳|大连|哈尔滨|石家庄|太原|兰州|海口|佛山|东莞|无锡|株洲|湘潭';
 const cityRe = new RegExp(CITIES);
@@ -70,8 +84,9 @@ if (!existsSync('public/' + EP.audio)) errs.push(`音频不存在：public/${EP.
   const lastEnd = TL.items.at(-1).from + TL.items.at(-1).d;
   for (const c of EP.cues) { const fr = F(c.startMs); if (fr >= lastEnd) errs.push(`字幕 #${c.i}「${c.text}」超出成片`); }
   if (EP.cues.length && F(EP.cues.at(-1).endMs) > TL.total) errs.push('最后一句字幕在成片结束后才结束'); }
-// 7) 字幕规格：字号 38–46 / 单行 ≤18 字 / 最多 2 行 / 位置在底部字幕区
+// 7) 字幕规格：字号 38–46 / 单行 ≤18 字 / 最多 2 行 / 相对画面水平居中 / 位置在底部字幕区
 if (SUB.size < 38 || SUB.size > 46) errs.push(`字幕字号 ${SUB.size}px 不在 38–46`);
+if (SUB.centerX !== CANVAS.w / 2) errs.push(`字幕 centerX ${SUB.centerX} 不是画面中心 ${CANVAS.w / 2}`);
 for (const c of EP.subs) { if (c.lines.length > 2) errs.push(`字幕「${c.lines.flat().map((t) => t.t).join('')}」超过 2 行`);
   for (const l of c.lines) { const t = l.map((x) => x.t).join(''); if (width(t) > SUB.maxChars + 0.01) errs.push(`字幕行「${t}」宽 ${width(t).toFixed(1)} 字 > ${SUB.maxChars}`); } }
 // 8) 素材慢放：素材比镜头短时自动慢放，最慢 0.75×，再短就报错（换更长的素材或调 trim）
@@ -106,10 +121,13 @@ if (process.argv.includes('--dom')) {
     const tag = `字幕 #${k + 1}@${fr}`;
     if (!got || got === 'null') { errs.push(`${tag}: 应显示但没渲染出来`); continue; }
     if (got.x < SAFE.left || got.x + got.w > SAFE.right) errs.push(`${tag}: 横向超出内容区 ${Math.round(got.x)}–${Math.round(got.x + got.w)}`);
+    const cx = got.x + got.w / 2;
+    if (Math.abs(cx - CANVAS.w / 2) > 2) errs.push(`${tag}: 字幕中心 ${cx.toFixed(1)} 未对齐画面中心 ${CANVAS.w / 2}`);
+    if (Array.isArray(got.ink)) got.ink.forEach((c, i) => { if (Math.abs(c - CANVAS.w / 2) > 4) errs.push(`${tag}: 第 ${i + 1} 行文字中心 ${c} 未对齐画面中心 ${CANVAS.w / 2}`); });
     if (got.y < SAFE.subtitleTop || got.y + got.h > 1080) errs.push(`${tag}: 纵向超出字幕区 ${Math.round(got.y)}–${Math.round(got.y + got.h)}`);
     if (got.fs < 38 || got.fs > 46) errs.push(`${tag}: 字号 ${got.fs}`);
     if (got.over) errs.push(`${tag}: 行内溢出`);
-    console.log(`  字幕 #${k + 1} ✓ y ${Math.round(got.y)}–${Math.round(got.y + got.h)}，宽 ${Math.round(got.w)}`); }
+    console.log(`  字幕 #${k + 1} ✓ 中心 ${Math.round(cx)}，y ${Math.round(got.y)}–${Math.round(got.y + got.h)}，宽 ${Math.round(got.w)}`); }
 }
 if (errs.length) { console.log('✗ 发现问题:\n' + errs.join('\n')); process.exit(1); }
-console.log('✓ 全部通过：音画同步（总帧=音频+片尾、无空隙、字幕全覆盖、锚点有效）、字幕规格、贴栏线、无重叠、组距≥48、素材不复用、无城市名、字号达标' + (process.argv.includes('--dom') ? '、填充率≤75%、行高≥1.3、无溢出' : ''));
+console.log('✓ 全部通过：音画同步（总帧=音频+片尾、无空隙、字幕全覆盖、锚点有效）、字幕规格、贴栏线、无重叠、组距≥48、素材不重复、背景不糊、主动画轮换、无城市名、字号达标' + (process.argv.includes('--dom') ? '、填充率≤75%、行高≥1.3、无溢出' : ''));

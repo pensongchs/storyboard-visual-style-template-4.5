@@ -34,7 +34,8 @@
 | `HighlightBar` | 竖向高亮条 | `x y h start` |
 | `UnderlineDraw` | 金线从左往右划出 | `x y w start` |
 | `SplitType` | 两行对比大字 | `r start line1 line2 sub` |
-| `StatPill` | 数据胶囊卡（键、数字、说明） | `r start k value unit dec sep s hi` |
+| `StatPill` | 数据胶囊卡（键、数字、说明），底色不透明 | `r start k value unit dec sep s hi from` |
+| `FillMeter` | 横向金条，和第二处大数字的下划线错开 | `start ratio label?` |
 
 ## 检查标记（DOM 检查依赖这些属性，新写组件时也要加）
 - `data-role="body"`：正文或说明文字，字号必须 ≥34。
@@ -45,4 +46,4 @@
 - 颜色：墨黑 `#121110`、暖白 `#F4EEE4`、金 `#D9B26F` / 高光 `#F3D79E`、珊瑚 `#E0715C`（风险）、绿 `#8DB89A`（利好）。
 - 字号：kicker 30、title 80、heroTitle 92、number 150、quote 60、rowTitle 40、body 34、label 28、chip 28、ringValue 52。
 - 动效（帧）：enter 20、stagger 6、chip 14、count 30、focus 10、freeze 30。
-- 转场（transitions.tsx）：pushBlur 12 → crossfade 10 → maskWipe 14 → lightSweep 12，按顺序轮换。
+- 转场（transitions.tsx）：pushBlur 12 → crossfade 10 → maskWipe 14 → lightSweep 12 → goldCut 11，按顺序轮换。背景本身不糊。

@@ -12,6 +12,8 @@ export type Shot = {
   sec?: number; kicker?: string; title?: string;
   /** 可选城市名。只在填写时显示为栏目行前缀（如「杭州 · 第一笔账」）；模板默认不写城市 */
   city?: string;
+  /** 本镜主动画名。相邻镜不得相同，一期至少 6 种（check-layout 会查） */
+  motion?: string;
   bg: Media & {blur?: number; dark?: number};
   data: any;
 };
