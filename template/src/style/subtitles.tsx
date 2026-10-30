@@ -1,4 +1,4 @@
-// 字幕：底部 180px 字幕安全区内，单行优先；磨砂浅底 + 暖白字 + 当前词沙金色（卡拉 OK）
+// 字幕：底部 180px 字幕安全区内水平居中，单行优先；磨砂浅底 + 暖白字 + 当前词沙金色（卡拉 OK）
 import React from 'react';
 import {useCurrentFrame, interpolate, Easing, getInputProps, delayRender, continueRender} from 'remotion';
 import {FONT} from './tokens';
@@ -21,7 +21,8 @@ export const Subtitles: React.FC<{ep: Episode; opts: SubOpts}> = ({ep, opts}) =>
     else { const r = el.getBoundingClientRect(); const ls = el.querySelectorAll('[data-sub="line"]');
       const fs = parseFloat(getComputedStyle(ls[0] as Element).fontSize);
       const over = [...ls].some((l) => (l as HTMLElement).scrollWidth > (l as HTMLElement).clientWidth + 1);
-      console.log(`SUBCHECK|${f}|${JSON.stringify({x: r.x, y: r.y, w: r.width, h: r.height, fs, lines: ls.length, over})}`); }
+      const ink = [...ls].map((l) => { const range = document.createRange(); range.selectNodeContents(l); const b = range.getBoundingClientRect(); return Math.round((b.x + b.width / 2) * 10) / 10; });
+      console.log(`SUBCHECK|${f}|${JSON.stringify({x: r.x, y: r.y, w: r.width, h: r.height, fs, lines: ls.length, over, ink})}`); }
     continueRender(h); })(); }, [h]);
   if (opts.show === false) return null;
   const list = ep.subs;

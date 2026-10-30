@@ -6,7 +6,7 @@
 import {readFileSync, mkdirSync, rmSync} from 'node:fs';
 import {spawnSync} from 'node:child_process';
 import {fileURLToPath} from 'node:url';
-import {SAFE, GRID, ROWS, MG_GAP} from '../src/style/grid.ts';
+import {CANVAS, SAFE, GRID, ROWS, MG_GAP} from '../src/style/grid.ts';
 import {layoutRects, titleRect, usesTitle} from '../src/style/layouts.ts';
 import {TYPE, MIN_FONT} from '../src/style/tokens.ts';
 import {SHOTS} from '../src/demo/shots.ts';
@@ -70,8 +70,9 @@ if (!existsSync('public/' + EP.audio)) errs.push(`音频不存在：public/${EP.
   const lastEnd = TL.items.at(-1).from + TL.items.at(-1).d;
   for (const c of EP.cues) { const fr = F(c.startMs); if (fr >= lastEnd) errs.push(`字幕 #${c.i}「${c.text}」超出成片`); }
   if (EP.cues.length && F(EP.cues.at(-1).endMs) > TL.total) errs.push('最后一句字幕在成片结束后才结束'); }
-// 7) 字幕规格：字号 38–46 / 单行 ≤18 字 / 最多 2 行 / 位置在底部字幕区
+// 7) 字幕规格：字号 38–46 / 单行 ≤18 字 / 最多 2 行 / 相对画面水平居中 / 位置在底部字幕区
 if (SUB.size < 38 || SUB.size > 46) errs.push(`字幕字号 ${SUB.size}px 不在 38–46`);
+if (SUB.centerX !== CANVAS.w / 2) errs.push(`字幕 centerX ${SUB.centerX} 不是画面中心 ${CANVAS.w / 2}`);
 for (const c of EP.subs) { if (c.lines.length > 2) errs.push(`字幕「${c.lines.flat().map((t) => t.t).join('')}」超过 2 行`);
   for (const l of c.lines) { const t = l.map((x) => x.t).join(''); if (width(t) > SUB.maxChars + 0.01) errs.push(`字幕行「${t}」宽 ${width(t).toFixed(1)} 字 > ${SUB.maxChars}`); } }
 // 8) 素材慢放：素材比镜头短时自动慢放，最慢 0.75×，再短就报错（换更长的素材或调 trim）
@@ -106,10 +107,13 @@ if (process.argv.includes('--dom')) {
     const tag = `字幕 #${k + 1}@${fr}`;
     if (!got || got === 'null') { errs.push(`${tag}: 应显示但没渲染出来`); continue; }
     if (got.x < SAFE.left || got.x + got.w > SAFE.right) errs.push(`${tag}: 横向超出内容区 ${Math.round(got.x)}–${Math.round(got.x + got.w)}`);
+    const cx = got.x + got.w / 2;
+    if (Math.abs(cx - CANVAS.w / 2) > 2) errs.push(`${tag}: 字幕中心 ${cx.toFixed(1)} 未对齐画面中心 ${CANVAS.w / 2}`);
+    if (Array.isArray(got.ink)) got.ink.forEach((c, i) => { if (Math.abs(c - CANVAS.w / 2) > 4) errs.push(`${tag}: 第 ${i + 1} 行文字中心 ${c} 未对齐画面中心 ${CANVAS.w / 2}`); });
     if (got.y < SAFE.subtitleTop || got.y + got.h > 1080) errs.push(`${tag}: 纵向超出字幕区 ${Math.round(got.y)}–${Math.round(got.y + got.h)}`);
     if (got.fs < 38 || got.fs > 46) errs.push(`${tag}: 字号 ${got.fs}`);
     if (got.over) errs.push(`${tag}: 行内溢出`);
-    console.log(`  字幕 #${k + 1} ✓ y ${Math.round(got.y)}–${Math.round(got.y + got.h)}，宽 ${Math.round(got.w)}`); }
+    console.log(`  字幕 #${k + 1} ✓ 中心 ${Math.round(cx)}，y ${Math.round(got.y)}–${Math.round(got.y + got.h)}，宽 ${Math.round(got.w)}`); }
 }
 if (errs.length) { console.log('✗ 发现问题:\n' + errs.join('\n')); process.exit(1); }
 console.log('✓ 全部通过：音画同步（总帧=音频+片尾、无空隙、字幕全覆盖、锚点有效）、字幕规格、贴栏线、无重叠、组距≥48、素材不复用、无城市名、字号达标' + (process.argv.includes('--dom') ? '、填充率≤75%、行高≥1.3、无溢出' : ''));
