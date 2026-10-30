@@ -39,10 +39,24 @@ for (const s of SHOTS) {
     if (Math.max(gx, gy) < need) errs.push(`${s.id}: ${ka} 与 ${kb} 间距 ${Math.max(gx, gy)}px < ${need}`);
   }
 }
-// 2) 素材不复用
+// 2) 素材不重复：背景和插画的视频、图片，同一 src 不得跨镜复用（换 trim 也不行）
 const seen = new Map(); const walk = (o, id) => { if (!o || typeof o !== 'object') return;
-  for (const [k, v] of Object.entries(o)) { if ((k === 'src' || k === 'character') && typeof v === 'string') { if (seen.has(v)) errs.push(`素材复用 ${v}: ${seen.get(v)} 与 ${id}`); else seen.set(v, id); } else walk(v, id); } };
+  for (const [k, v] of Object.entries(o)) { if ((k === 'src' || k === 'character') && typeof v === 'string') { if (seen.has(v)) errs.push(`${id}: 素材重复 ${v}（已用于 ${seen.get(v)}）。同一条片子里背景和插画不得复用`); else seen.set(v, id); } else walk(v, id); } };
 for (const s of SHOTS) walk(s, s.id);
+// 2b) 背景不糊；主动画相邻不重复、同版式至少隔 2 镜、一期至少 6 种主动画
+for (const s of SHOTS) {
+  const b = s.bg?.blur ?? 0;
+  if (b > 0) errs.push(`${s.id}: 背景不糊，${s.bg.video ? '视频' : '静图'} blur=${b} 应改为 0（靠压暗和前景底衬，不要糊整幅背景）`);
+  if (!s.motion) errs.push(`${s.id}: 缺少 motion（本镜主动画，相邻镜不得相同）`);
+}
+const lastLayout = new Map();
+SHOTS.forEach((s, i) => {
+  if (i && s.layout === SHOTS[i - 1].layout) errs.push(`${s.id}: 与上一镜同版式 ${s.layout}`);
+  if (i && s.motion && s.motion === SHOTS[i - 1].motion) errs.push(`${s.id}: 主动画 ${s.motion} 与上一镜重复`);
+  if (lastLayout.has(s.layout) && i - lastLayout.get(s.layout) < 3) errs.push(`${s.id}: 版式 ${s.layout} 与 ${SHOTS[lastLayout.get(s.layout)].id} 间隔不足 2 镜`);
+  lastLayout.set(s.layout, i);
+});
+if (new Set(SHOTS.map((s) => s.motion).filter(Boolean)).size < Math.min(6, SHOTS.length)) errs.push('主动画种类不足 6 种');
 // 3) 城市中性：除 city 字段外，所有屏幕文字不得出现城市名
 const CITIES = '长沙|北京|上海|广州|深圳|杭州|成都|重庆|武汉|南京|西安|天津|苏州|郑州|合肥|青岛|宁波|厦门|福州|济南|昆明|南昌|贵阳|南宁|长春|沈阳|大连|哈尔滨|石家庄|太原|兰州|海口|佛山|东莞|无锡|株洲|湘潭';
 const cityRe = new RegExp(CITIES);
@@ -116,4 +130,4 @@ if (process.argv.includes('--dom')) {
     console.log(`  字幕 #${k + 1} ✓ 中心 ${Math.round(cx)}，y ${Math.round(got.y)}–${Math.round(got.y + got.h)}，宽 ${Math.round(got.w)}`); }
 }
 if (errs.length) { console.log('✗ 发现问题:\n' + errs.join('\n')); process.exit(1); }
-console.log('✓ 全部通过：音画同步（总帧=音频+片尾、无空隙、字幕全覆盖、锚点有效）、字幕规格、贴栏线、无重叠、组距≥48、素材不复用、无城市名、字号达标' + (process.argv.includes('--dom') ? '、填充率≤75%、行高≥1.3、无溢出' : ''));
+console.log('✓ 全部通过：音画同步（总帧=音频+片尾、无空隙、字幕全覆盖、锚点有效）、字幕规格、贴栏线、无重叠、组距≥48、素材不重复、背景不糊、主动画轮换、无城市名、字号达标' + (process.argv.includes('--dom') ? '、填充率≤75%、行高≥1.3、无溢出' : ''));

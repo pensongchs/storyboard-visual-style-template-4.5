@@ -1,7 +1,7 @@
 import React from 'react';
 import {AbsoluteFill, Freeze, Img, staticFile, useCurrentFrame, getInputProps} from 'remotion';
 import {
-  ArrowConnector, Backdrop, BareNumber, Chip, ExampleMark, FloatLabel, GoldText, Headline, HighlightBar,
+  ArrowConnector, Backdrop, BareNumber, Chip, ExampleMark, FillMeter, FloatLabel, GoldText, Headline, HighlightBar,
   IconRow, Kicker, MediaFrame, ProgressRing, QuoteBlock, SoftCallout, SplitType, StatPill, Timeline, UnderlineDraw, prog,
   LiveFrameCtx,
 } from './components';
@@ -43,12 +43,13 @@ const BareNumView: React.FC<{s: Shot}> = ({s}) => {
   return <>
     <div style={{position: 'absolute', left: N.x, top: N.y, width: N.w, height: N.h, display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 48}}>
       <Chip start={6} tone="gold">{d.chip}</Chip>
-      <BareNumber r={{x: 0, y: 0, w: N.w, h: 260}} start={c0} value={d.value} unit={d.unit} dec={d.dec} label={d.label} size={150} flow />
+      <BareNumber r={{x: 0, y: 0, w: N.w, h: 260}} start={c0} value={d.value} unit={d.unit} dec={d.dec} label={d.label} size={150} flow from={d.variant === 'meter' ? 'scale' : 'up'} />
       <div style={{position: 'relative'}}>
-        <UnderlineDraw x={0} y={0} w={360} start={c0 + 18} />
-        <div style={{paddingTop: 28, fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.body, lineHeight: 1.4, color: COLOR.sub, opacity: prog(f, c0 + 22, 14)}} data-role="body">
+        {d.variant === 'meter' ? null : <UnderlineDraw x={0} y={0} w={360} start={c0 + 18} />}
+        <div style={{paddingTop: d.variant === 'meter' ? 0 : 28, fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.body, lineHeight: 1.4, color: COLOR.sub, opacity: prog(f, c0 + 22, 14), textShadow: '0 2px 8px rgba(0,0,0,0.8)'}} data-role="body">
           <GoldText text={d.formula} />
         </div>
+        {d.variant === 'meter' && <FillMeter start={c0 + 16} ratio={d.meter ?? 0.72} label="按面积估算" />}
       </div>
       <div style={{display: 'flex', gap: 24}}>{d.chips?.map((c: any, i: number) => <Chip key={i} start={c0 + 30 + i * 6} tone={c.tone}>{c.t}</Chip>)}</div>
     </div>
@@ -62,10 +63,10 @@ const SplitVs: React.FC<{s: Shot}> = ({s}) => {
     <MediaFrame r={R.mediaL} start={6} {...d.L.media} from="left" soft />
     <MediaFrame r={R.mediaR} start={12} {...d.R.media} from="right" soft />
     <ArrowConnector x={A.x + 48} y={A.y + 18} w={A.w - 96} start={22} />
-    <BareNumber r={R.dataL} start={l0} value={d.L.value} unit={d.L.unit} dec={d.L.dec} label={d.L.label} gold={d.winner === 'L'} size={110}>
+    <BareNumber r={R.dataL} start={l0} value={d.L.value} unit={d.L.unit} dec={d.L.dec} label={d.L.label} gold={d.winner === 'L'} size={110} from="left">
       {d.L.chip && <Chip start={l0 + 16} tone={d.L.chip.tone}>{d.L.chip.t}</Chip>}
     </BareNumber>
-    <BareNumber r={R.dataR} start={r0} value={d.R.value} unit={d.R.unit} dec={d.R.dec} label={d.R.label} gold={d.winner === 'R'} size={110}>
+    <BareNumber r={R.dataR} start={r0} value={d.R.value} unit={d.R.unit} dec={d.R.dec} label={d.R.label} gold={d.winner === 'R'} size={110} from="right">
       {d.R.chip && <Chip start={r0 + 12} tone={d.R.chip.tone}>{d.R.chip.t}</Chip>}
     </BareNumber>
   </>;
@@ -98,7 +99,7 @@ const QuoteStack: React.FC<{s: Shot; dur: number}> = ({s, dur}) => {
   return <>
     <QuoteBlock r={R.quote} start={4} text={d.quote} sub={d.sub} />
     {d.rows.map((row: any, i: number) =>
-      <IconRow key={i} r={rows[i]} start={16 + i * MOTION.stagger} idx={`0${i + 1}`} title={row.t} sub={row.s} tip={row.k} active={i === act} />)}
+      <IconRow key={i} r={rows[i]} start={16 + i * MOTION.stagger} idx={`0${i + 1}`} title={row.t} sub={row.s} tip={row.k} active={i === act} from="left" />)}
     <SoftCallout r={R.warn} start={at('warn', dur - 56)} text={d.warn} tone="coral" />
   </>;
 };
@@ -111,7 +112,7 @@ const RingFeature: React.FC<{s: Shot}> = ({s}) => {
     <ProgressRing cx={ring.x + size / 2} cy={ring.y + ring.h / 2} size={size} start={at('ring', 18)} ratio={d.ring.ratio} label={d.ring.label} value={d.ring.value} />
     {d.ring.note && <div data-role="body" style={{position: 'absolute', left: ring.x + size + 48, top: ring.y, width: ring.w - size - 48, height: ring.h, display: 'flex', alignItems: 'center',
       fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.body, lineHeight: 1.4, color: COLOR.sub, whiteSpace: 'pre-line'}}><GoldText text={d.ring.note} /></div>}
-    <StatPill r={R.a} start={Math.max(at('a', 28), at('ring', 18) + 10)} {...d.a} hi />
+    <StatPill r={R.a} start={Math.max(at('a', 28), at('ring', 18) + 10)} {...d.a} hi from="scale" />
   </>;
 };
 
@@ -121,11 +122,11 @@ const WaitVs: React.FC<{s: Shot}> = ({s}) => {
     <MediaFrame r={R.mediaL} start={6} {...d.L.media} from="left" soft />
     <MediaFrame r={R.mediaR} start={12} {...d.R.media} from="right" soft />
     <HighlightBar x={R.numL.x} y={R.numL.y + 8} h={R.numL.h - 16} start={l0 - 2} />
-    <BareNumber r={{...R.numL, x: R.numL.x + 40, w: R.numL.w - 40}} start={l0} value={d.L.value} unit={d.L.unit} label={d.L.label} gold={false} size={110}>
+    <BareNumber r={{...R.numL, x: R.numL.x + 40, w: R.numL.w - 40}} start={l0} value={d.L.value} unit={d.L.unit} label={d.L.label} gold={false} size={110} from="left">
       {d.L.chip && <Chip start={l0 + 18} tone={d.L.chip.tone}>{d.L.chip.t}</Chip>}
     </BareNumber>
     <ArrowConnector x={A.x + 48} y={A.y + 16} w={A.w - 96} start={r0 - 2} />
-    <BareNumber r={R.numR} start={r0} value={d.R.value} unit={d.R.unit} label={d.R.label} gold size={110}>
+    <BareNumber r={R.numR} start={r0} value={d.R.value} unit={d.R.unit} label={d.R.label} gold size={110} from="scale">
       {d.R.chip && <Chip start={r0 + 12} tone={d.R.chip.tone}>{d.R.chip.t}</Chip>}
     </BareNumber>
   </>;
@@ -134,7 +135,7 @@ const WaitVs: React.FC<{s: Shot}> = ({s}) => {
 const TriadSoft: React.FC<{s: Shot; dur: number}> = ({s, dur}) => {
   const d = s.data; const R = layoutRects('triadSoft'); const at = useAt();
   return <>
-    {d.cols.map((c: any, i: number) => <StatPill key={i} r={R[`c${i}`]} start={at(`c${i}`, 8 + i * 8)} {...c} hi={i === 1} />)}
+    {d.cols.map((c: any, i: number) => <StatPill key={i} r={R[`c${i}`]} start={at(`c${i}`, 8 + i * 8)} {...c} hi={i === 1} from={i === 0 ? 'left' : i === 2 ? 'right' : 'scale'} />)}
     <SoftCallout r={R.note} start={at('note', dur - 56)} text={d.note.t} />
   </>;
 };
@@ -150,8 +151,9 @@ const OutroAir: React.FC<{s: Shot}> = ({s}) => {
     <div style={{position: 'absolute', left: t.x, top: t.y, width: t.w, height: t.h, display: 'flex', flexDirection: 'column', justifyContent: 'center',
       alignItems: center ? 'center' : 'flex-start', textAlign: center ? 'center' : 'left'}}>
       {d.eyebrow && <div style={{fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.label, color: COLOR.goldHi, letterSpacing: 8, opacity: prog(f, 6, 14)}}>{d.eyebrow}</div>}
-      <div style={{fontFamily: FONT.title, fontSize: 76, color: COLOR.warm, marginTop: 40, lineHeight: 1.35, whiteSpace: 'pre-line',
-        opacity: prog(f, 12, 18), transform: `translateY(${(1 - prog(f, 12, 18)) * 24}px)`}}><GoldText text={d.line} /></div>
+      <div style={{fontFamily: FONT.title, fontSize: 76, color: COLOR.warm, marginTop: 40, lineHeight: 1.35, whiteSpace: 'pre-line', padding: '12px 28px', borderRadius: 18,
+        background: 'linear-gradient(90deg, rgba(8,7,6,0.15), rgba(8,7,6,0.72), rgba(8,7,6,0.15))', filter: 'drop-shadow(0 3px 14px rgba(0,0,0,0.55))',
+        opacity: prog(f, 12, 18), transform: `translateY(${(1 - prog(f, 12, 18)) * 24}px) scale(${0.96 + 0.04 * prog(f, 12, 18)})`}}><GoldText text={d.line} /></div>
       <div style={{position: 'relative', width: 240, height: 3, marginTop: 48}}><UnderlineDraw x={0} y={0} w={240} start={30} /></div>
       {d.cta && <div data-role="body" style={{marginTop: 48, fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.body, lineHeight: 1.4, color: COLOR.sub, opacity: prog(f, c0, 14)}}><GoldText text={d.cta} /></div>}
       {d.account && <div style={{marginTop: 24, fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.label, color: COLOR.goldHi, opacity: prog(f, c0 + 6, 14)}}>{d.account}</div>}

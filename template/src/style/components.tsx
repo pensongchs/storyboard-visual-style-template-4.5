@@ -34,23 +34,23 @@ const enterStyle = (from: Enter, p: number): React.CSSProperties => {
 };
 
 const toneBg: Record<Tone, React.CSSProperties> = {
-  dark: {background: 'linear-gradient(160deg, rgba(36,33,30,0.82), rgba(18,17,16,0.78))', color: COLOR.warm, border: '1px solid rgba(255,255,255,0.14)',
-    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.18), 0 18px 40px rgba(0,0,0,0.45)'},
-  pearl: {background: 'linear-gradient(160deg, rgba(250,246,238,0.94), rgba(232,224,210,0.9))', color: COLOR.pearlInk, border: '1px solid rgba(255,255,255,0.7)',
+  dark: {background: 'linear-gradient(160deg, rgba(36,33,30,0.94), rgba(16,14,12,0.92))', color: COLOR.warm, border: '1px solid rgba(255,255,255,0.22)',
+    boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.2), 0 18px 40px rgba(0,0,0,0.5)'},
+  pearl: {background: 'linear-gradient(160deg, rgba(250,246,238,0.97), rgba(232,224,210,0.95))', color: COLOR.pearlInk, border: '1px solid rgba(255,255,255,0.8)',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.9), 0 18px 40px rgba(0,0,0,0.35)'},
-  gold: {background: 'linear-gradient(160deg, rgba(80,60,28,0.88), rgba(36,28,14,0.86))', color: COLOR.warm, border: '1px solid rgba(243,215,158,0.55)',
-    boxShadow: 'inset 0 1px 0 rgba(255,240,210,0.35), 0 0 36px rgba(217,178,111,0.28), 0 18px 40px rgba(0,0,0,0.45)'},
-  coral: {background: 'linear-gradient(160deg, rgba(120,42,32,0.9), rgba(56,22,18,0.88))', color: '#FFE3DB', border: '1px solid rgba(224,113,92,0.7)',
-    boxShadow: 'inset 0 1px 0 rgba(255,200,180,0.25), 0 0 28px rgba(224,113,92,0.35), 0 18px 40px rgba(0,0,0,0.45)'},
-  ghost: {background: 'rgba(255,255,255,0.04)', color: COLOR.warm, border: '1px solid rgba(255,255,255,0.08)', boxShadow: 'none'},
+  gold: {background: 'linear-gradient(160deg, rgba(72,52,22,0.96), rgba(28,20,10,0.94))', color: COLOR.warm, border: '1px solid rgba(243,215,158,0.7)',
+    boxShadow: 'inset 0 1px 0 rgba(255,240,210,0.4), 0 0 28px rgba(217,178,111,0.22), 0 18px 40px rgba(0,0,0,0.5)'},
+  coral: {background: 'linear-gradient(160deg, rgba(110,36,26,0.96), rgba(48,16,12,0.94))', color: '#FFE3DB', border: '1px solid rgba(224,113,92,0.8)',
+    boxShadow: 'inset 0 1px 0 rgba(255,200,180,0.3), 0 0 22px rgba(224,113,92,0.28), 0 18px 40px rgba(0,0,0,0.5)'},
+  ghost: {background: 'rgba(12,11,10,0.72)', color: COLOR.warm, border: '1px solid rgba(255,255,255,0.2)', boxShadow: '0 10px 24px rgba(0,0,0,0.35)'},
 };
 
 /** 玻璃卡（少用；全屏不要堆满） */
 export const GlassCard: React.FC<{r: Rect; start: number; tone?: Tone; from?: Enter; dim?: number; radius?: number; pad?: number | string; children: React.ReactNode; style?: React.CSSProperties}> =
 ({r, start, tone = 'dark', from = 'up', dim = 1, radius = RADIUS.card, pad = 36, children, style}) => {
   const f = useCurrentFrame(); const p = prog(f, start);
-  return <div style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, borderRadius: radius, backdropFilter: tone === 'ghost' ? undefined : 'blur(18px)',
-    WebkitBackdropFilter: tone === 'ghost' ? undefined : 'blur(18px)', padding: pad, boxSizing: 'border-box', display: 'flex', flexDirection: 'column',
+  return <div style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, borderRadius: radius, backdropFilter: tone === 'ghost' ? undefined : 'blur(8px)',
+    WebkitBackdropFilter: tone === 'ghost' ? undefined : 'blur(8px)', padding: pad, boxSizing: 'border-box', display: 'flex', flexDirection: 'column',
     opacity: dim, ...toneBg[tone], ...enterStyle(from, p), ...style}}>{children}</div>;
 };
 
@@ -90,7 +90,7 @@ export const Chip: React.FC<{children: React.ReactNode; start: number; tone?: Ch
   const f = useCurrentFrame(); const p = prog(f, start, MOTION.chip);
   const st: Record<ChipTone, React.CSSProperties> = {
     gold: {background: 'linear-gradient(135deg,#F3D79E,#C99A52)', color: '#2a2012', border: '1px solid rgba(255,240,210,0.9)'},
-    glass: {background: 'rgba(255,255,255,0.10)', color: COLOR.warm, border: '1px solid rgba(255,255,255,0.28)'},
+    glass: {background: 'rgba(14,12,10,0.82)', color: COLOR.warm, border: '1px solid rgba(255,255,255,0.42)'},
     coral: {background: 'rgba(224,113,92,0.22)', color: '#FFD3C8', border: '1px solid rgba(224,113,92,0.7)'},
     green: {background: 'rgba(141,184,154,0.2)', color: '#D3EEDC', border: '1px solid rgba(141,184,154,0.7)'},
   };
@@ -119,8 +119,9 @@ export const GoldText: React.FC<{text: string}> = ({text}) => <>{text.split(/(\{
 
 export const Headline: React.FC<{text: string; start?: number}> = ({text, start = 2}) => {
   const f = useCurrentFrame(); const p = prog(f, start, 16);
-  return <div style={{position: 'absolute', left: 96, top: 100, width: 1536, height: 100, display: 'flex', alignItems: 'center', opacity: ease(p), transform: `translateY(${(1 - ease(p)) * 16}px)`}}>
-    <div style={{fontFamily: FONT.title, fontSize: TYPE.title, color: COLOR.warm, lineHeight: 1.15, whiteSpace: 'pre-line'}}><GoldText text={text} /></div>
+  return <div style={{position: 'absolute', left: 96, top: 100, width: 1536, height: 100, display: 'flex', alignItems: 'center', opacity: ease(p), transform: `translateY(${(1 - ease(p)) * 16}px)`,
+    background: 'linear-gradient(90deg, rgba(8,7,6,0.82) 0%, rgba(8,7,6,0.62) 48%, rgba(8,7,6,0) 100%)', borderRadius: 12}}>
+    <div style={{fontFamily: FONT.title, fontSize: TYPE.title, color: COLOR.warm, lineHeight: 1.15, whiteSpace: 'pre-line', paddingLeft: 18, filter: 'drop-shadow(0 2px 10px rgba(0,0,0,0.8))'}}><GoldText text={text} /></div>
   </div>;
 };
 
@@ -143,18 +144,18 @@ export const ExampleMark: React.FC = () => (
     fontFamily: FONT.body, fontSize: MIN_FONT.any, color: 'rgba(244,238,228,0.45)'}}>* 数据为示例</div>
 );
 
-/** 背景：整体提亮（亮度 ×1.1、压暗降约 0.15），文字可读性靠左上/底部的渐变压暗而非整屏压黑 */
-export const Backdrop: React.FC<{src: string; video?: boolean; blur?: number; dark?: number; trimStart?: number}> = ({src, video, blur = 0, dark = 0.45, trimStart = 0}) => {
+/** 背景保持清晰。blur 只为兼容旧数据，不再作用到画面；文字靠压暗、上下渐变和前景底衬，不靠整幅磨砂。 */
+export const Backdrop: React.FC<{src: string; video?: boolean; blur?: number; dark?: number; trimStart?: number}> = ({src, video, blur: _blur = 0, dark = 0.45, trimStart = 0}) => {
   const k = Math.max(0.22, dark - 0.16);
   // 静态图背景做缓慢推近（按真实帧，不受定格影响），避免静图镜头「停住」
   const cur = useCurrentFrame(); const live = React.useContext(LiveFrameCtx) ?? cur;
-  const filter = `${blur ? `blur(${blur}px) ` : ''}brightness(1.1) saturate(1.05)`;
+  const filter = 'brightness(1.1) saturate(1.05)';
   return <AbsoluteFill>
     {video
       ? <LiveVideo src={src} style={{width: '100%', height: '100%', objectFit: 'cover', filter}} trimStart={trimStart} />
       : <Img src={staticFile(src)} style={{width: '100%', height: '100%', objectFit: 'cover', filter, transform: `scale(${1.02 + live * 0.0003})`}} />}
     <AbsoluteFill style={{background: `rgba(12,11,10,${k})`}} />
-    <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(12,11,10,0.38) 0%, rgba(12,11,10,0) 30%, rgba(12,11,10,0) 70%, rgba(12,11,10,0.32) 100%)'}} />
+    <AbsoluteFill style={{background: 'linear-gradient(180deg, rgba(12,11,10,0.5) 0%, rgba(12,11,10,0) 26%, rgba(12,11,10,0) 68%, rgba(12,11,10,0.42) 100%)'}} />
   </AbsoluteFill>;
 };
 
@@ -173,7 +174,7 @@ export const BareNumber: React.FC<{r: Rect; start: number; value: number; unit: 
   const f = useCurrentFrame(); const p = prog(f, start);
   const pos: React.CSSProperties = flow ? {position: 'relative'} : {position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h};
   return <div style={{...pos, display: 'flex', flexDirection: 'column', justifyContent: 'center', ...enterStyle(from, p)}}>
-    {label && <div style={{fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.body, color: COLOR.sub, marginBottom: 16}}>{label}</div>}
+    {label && <div style={{fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.body, color: COLOR.sub, marginBottom: 16, textShadow: '0 2px 8px rgba(0,0,0,0.75)'}}>{label}</div>}
     <div style={{fontFamily: FONT.num, fontSize: fs, lineHeight: 1.05, whiteSpace: 'nowrap',
       ...(gold ? {background: 'linear-gradient(180deg,#FBE6BC,#D9B26F 55%,#9C7536)', WebkitBackgroundClip: 'text', color: 'transparent'} : {color: COLOR.warm})}}>
       <Count to={value} start={start + 4} dec={dec} sep={sep} />
@@ -205,10 +206,13 @@ export const Timeline: React.FC<{r: Rect; start: number; steps: {t: string; s: s
       const p = prog(f, start + i * MOTION.stagger, 18); const on = i === active; const done = i < active;
       const x = i * (cw + gap);
       return <div key={i} style={{position: 'absolute', left: x, top: 0, width: cw, height: r.h, display: 'flex', flexDirection: 'column', alignItems: 'center', opacity: ease(p), transform: `translateY(${(1 - ease(p)) * 20}px)`}}>
-        <div style={{width: 28, height: 28, borderRadius: 14, marginTop: 22, background: on || done ? 'radial-gradient(circle at 30% 25%,#FBE6BC,#D9B26F)' : 'rgba(255,255,255,0.2)',
-          boxShadow: on ? '0 0 22px rgba(217,178,111,0.7)' : 'none', border: on ? '2px solid #fff' : '2px solid transparent'}} />
-        <div style={{marginTop: 32, fontFamily: FONT.title, fontSize: on ? 46 : 40, lineHeight: 1.3, color: on ? COLOR.goldHi : COLOR.warm, textAlign: 'center'}}>{st.t}</div>
-        <div data-role="body" style={{marginTop: 14, fontFamily: FONT.body, fontSize: TYPE.body, color: COLOR.sub, textAlign: 'center', lineHeight: 1.4}}>{st.s}</div>
+        <div style={{position: 'relative', width: 28, height: 28, marginTop: 22}}>
+          {on && <div style={{position: 'absolute', left: -10, top: -10, width: 48, height: 48, borderRadius: 24, border: '2px solid rgba(243,215,158,0.75)', transform: `scale(${0.85 + 0.18 * (0.5 + 0.5 * Math.sin(f / 5))})`}} />}
+          <div style={{width: 28, height: 28, borderRadius: 14, background: on || done ? 'radial-gradient(circle at 30% 25%,#FBE6BC,#D9B26F)' : 'rgba(18,16,14,0.72)',
+            boxShadow: on ? '0 0 22px rgba(217,178,111,0.7)' : 'none', border: on ? '2px solid #fff' : '2px solid rgba(255,255,255,0.35)'}} />
+        </div>
+        <div style={{marginTop: 32, fontFamily: FONT.title, fontSize: on ? 46 : 40, lineHeight: 1.3, color: on ? COLOR.goldHi : COLOR.warm, textAlign: 'center', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.85))'}}>{st.t}</div>
+        <div data-role="body" style={{marginTop: 14, fontFamily: FONT.body, fontSize: TYPE.body, color: COLOR.sub, textAlign: 'center', lineHeight: 1.4, textShadow: '0 2px 8px rgba(0,0,0,0.8)'}}>{st.s}</div>
         {st.chip && <div style={{marginTop: 28}}><Chip start={start + 10 + i * 6} tone={on ? 'gold' : 'glass'}>{st.chip}</Chip></div>}
       </div>;
     })}
@@ -220,11 +224,11 @@ export const IconRow: React.FC<{r: Rect; start: number; idx: string; title: stri
 ({r, start, idx, title, sub, tip, active, from = 'right'}) => {
   const f = useCurrentFrame(); const p = prog(f, start);
   return <div style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, display: 'flex', alignItems: 'center', gap: 32, padding: '0 24px', boxSizing: 'border-box',
-    borderBottom: '1px solid rgba(255,255,255,0.12)', ...enterStyle(from, p)}}>
+    borderRadius: 16, background: active ? 'rgba(12,11,10,0.72)' : 'rgba(12,11,10,0.5)', border: '1px solid rgba(255,255,255,0.16)', ...enterStyle(from, p)}}>
     <div style={{fontFamily: FONT.num, fontSize: 40, color: active ? COLOR.goldHi : 'rgba(244,238,228,0.4)', width: 64, flexShrink: 0}}>{idx}</div>
     <div style={{flex: 1, minWidth: 0}}>
-      <div style={{fontFamily: FONT.title, fontSize: TYPE.rowTitle, lineHeight: 1.3, color: active ? COLOR.goldHi : COLOR.warm}}>{title}</div>
-      <div data-role="body" style={{fontFamily: FONT.body, fontSize: TYPE.body, lineHeight: 1.35, color: COLOR.sub, marginTop: 6}}>{sub}</div>
+      <div style={{fontFamily: FONT.title, fontSize: TYPE.rowTitle, lineHeight: 1.3, color: active ? COLOR.goldHi : COLOR.warm, textShadow: '0 2px 8px rgba(0,0,0,0.75)'}}>{title}</div>
+      <div data-role="body" style={{fontFamily: FONT.body, fontSize: TYPE.body, lineHeight: 1.35, color: COLOR.sub, marginTop: 6, textShadow: '0 2px 8px rgba(0,0,0,0.75)'}}>{sub}</div>
     </div>
     {tip && <div style={{flexShrink: 0}}><Chip start={start + 8} tone={active ? 'gold' : 'glass'}>{tip}</Chip></div>}
     {active && <div style={{position: 'absolute', left: 0, top: r.h - 2, width: `${100 * ease(prog(f, start + 4, 16))}%`, height: 2, background: COLOR.goldHi}} />}
@@ -234,10 +238,10 @@ export const IconRow: React.FC<{r: Rect; start: number; idx: string; title: stri
 /** 引用号 + 引文 */
 export const QuoteBlock: React.FC<{r: Rect; start: number; text: string; sub?: string}> = ({r, start, text, sub}) => {
   const f = useCurrentFrame(); const p = prog(f, start);
-  return <div style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, ...enterStyle('blur', p)}}>
-    <div data-deco style={{fontFamily: FONT.title, fontSize: 120, lineHeight: 0.8, color: 'rgba(217,178,111,0.35)'}}>“</div>
-    <div style={{fontFamily: FONT.title, fontSize: TYPE.quote, color: COLOR.warm, lineHeight: 1.35, marginTop: 0, whiteSpace: 'pre-line'}}><GoldText text={text} /></div>
-    {sub && <div data-role="body" style={{fontFamily: FONT.body, fontSize: TYPE.body, lineHeight: 1.4, color: COLOR.sub, marginTop: 40}}>{sub}</div>}
+  return <div style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, overflow: 'hidden', ...enterStyle('up', p)}}>
+    <div data-deco style={{fontFamily: FONT.title, fontSize: 120, lineHeight: 0.8, color: 'rgba(217,178,111,0.45)'}}>“</div>
+    <div style={{fontFamily: FONT.title, fontSize: TYPE.quote, color: COLOR.warm, lineHeight: 1.35, marginTop: 0, whiteSpace: 'pre-line', filter: 'drop-shadow(0 3px 12px rgba(0,0,0,0.8))'}}><GoldText text={text} /></div>
+    {sub && <div data-role="body" style={{fontFamily: FONT.body, fontSize: TYPE.body, lineHeight: 1.4, color: COLOR.sub, marginTop: 40, textShadow: '0 2px 8px rgba(0,0,0,0.8)'}}>{sub}</div>}
   </div>;
 };
 
@@ -246,8 +250,8 @@ export const SoftCallout: React.FC<{r: Rect; start: number; text: string; tone?:
   const f = useCurrentFrame(); const p = prog(f, start, 16); const H = Math.min(h, r.h);
   // 宽度随文字收缩（左边贴栏线），内边距 56；文字宽 ≤ 容器 75%
   return <div data-fit="callout" style={{position: 'absolute', left: r.x, top: r.y + (r.h - H) / 2, maxWidth: r.w, height: H, display: 'inline-flex', alignItems: 'center', gap: 24, padding: '0 56px', boxSizing: 'border-box', whiteSpace: 'nowrap',
-    borderRadius: 18, background: tone === 'coral' ? 'rgba(224,113,92,0.16)' : 'rgba(217,178,111,0.12)', border: `1px solid ${tone === 'coral' ? 'rgba(224,113,92,0.5)' : 'rgba(217,178,111,0.4)'}`,
-    boxShadow: `0 0 40px ${tone === 'coral' ? 'rgba(224,113,92,0.2)' : 'rgba(217,178,111,0.18)'}`, ...enterStyle('scale', p)}}>
+    borderRadius: 18, background: tone === 'coral' ? 'linear-gradient(90deg, rgba(78,26,18,0.94), rgba(48,16,12,0.9))' : 'linear-gradient(90deg, rgba(42,32,16,0.94), rgba(20,16,10,0.9))', border: `1px solid ${tone === 'coral' ? 'rgba(224,113,92,0.85)' : 'rgba(243,215,158,0.7)'}`,
+    boxShadow: `0 12px 28px rgba(0,0,0,0.4)`, ...enterStyle('scale', p)}}>
     <div style={{width: 52, height: 52, borderRadius: 26, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: FONT.num, fontSize: 28,
       color: tone === 'coral' ? '#fff' : '#2a2012', background: tone === 'coral' ? COLOR.coral : 'radial-gradient(circle at 30% 25%,#FBE6BC,#D9B26F)'}}>{icon ?? (tone === 'coral' ? '!' : '✓')}</div>
     <span data-fit-text style={{fontFamily: FONT.title, fontSize: 38, color: tone === 'coral' ? '#FFE3DB' : COLOR.warm}}><GoldText text={text} /></span>
@@ -288,8 +292,8 @@ export const HighlightBar: React.FC<{x: number; y: number; h: number; start: num
 export const SplitType: React.FC<{r: Rect; start: number; line1: string; line2: string; sub?: string}> = ({r, start, line1, line2, sub}) => {
   const f = useCurrentFrame();
   return <div style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, display: 'flex', flexDirection: 'column', justifyContent: 'center'}}>
-    <div style={{fontFamily: FONT.title, fontSize: TYPE.heroTitle, color: COLOR.warm, lineHeight: 1.3, opacity: ease(prog(f, start, 16)), transform: `translateY(${(1 - ease(prog(f, start, 16))) * 24}px)`}}>{line1}</div>
-    <div style={{fontFamily: FONT.title, fontSize: TYPE.heroTitle, lineHeight: 1.3, marginTop: 0, opacity: ease(prog(f, start + 8, 16)), transform: `translateY(${(1 - ease(prog(f, start + 8, 16))) * 24}px)`,
+    <div style={{fontFamily: FONT.title, fontSize: TYPE.heroTitle, color: COLOR.warm, lineHeight: 1.3, opacity: ease(prog(f, start, 16)), transform: `translateX(${(1 - ease(prog(f, start, 16))) * -28}px)`, filter: 'drop-shadow(0 3px 12px rgba(0,0,0,0.8))'}}>{line1}</div>
+    <div style={{fontFamily: FONT.title, fontSize: TYPE.heroTitle, lineHeight: 1.3, marginTop: 0, opacity: ease(prog(f, start + 8, 16)), transform: `translateY(${(1 - ease(prog(f, start + 8, 16))) * 24}px)`, filter: 'drop-shadow(0 3px 12px rgba(0,0,0,0.75))',
       background: 'linear-gradient(180deg,#FBE6BC,#D9B26F 60%,#B48843)', WebkitBackgroundClip: 'text', color: 'transparent'}}>{line2}</div>
     <div style={{position: 'relative', marginTop: 28, height: 3}}>
       <UnderlineDraw x={0} y={0} w={Math.min(420, r.w * 0.55)} start={start + 20} />
@@ -299,12 +303,23 @@ export const SplitType: React.FC<{r: Rect; start: number; line1: string; line2: 
 };
 
 /** 紧凑统计胶囊（小元素） */
-export const StatPill: React.FC<{r: Rect; start: number; k: string; value: number; unit: string; dec?: number; sep?: boolean; s?: string; hi?: boolean}> =
-({r, start, k, value, unit, dec, sep, s, hi}) => {
+/** 横向填满的金条，用来和「下划线 + 滚动数字」错开 */
+export const FillMeter: React.FC<{start: number; ratio: number; label?: string}> = ({start, ratio, label}) => {
+  const f = useCurrentFrame(); const p = prog(f, start, 22);
+  return <div style={{marginTop: 8}}>
+    {label && <div style={{fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.label, color: COLOR.goldHi, marginBottom: 10, textShadow: '0 2px 8px rgba(0,0,0,0.75)'}}>{label}</div>}
+    <div style={{height: 10, borderRadius: 5, background: 'rgba(255,255,255,0.16)', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.2)'}}>
+      <div style={{height: '100%', width: `${Math.max(0, Math.min(1, ratio)) * 100 * ease(p)}%`, borderRadius: 5, background: 'linear-gradient(90deg,#FBE6BC,#C99A52)'}} />
+    </div>
+  </div>;
+};
+
+export const StatPill: React.FC<{r: Rect; start: number; k: string; value: number; unit: string; dec?: number; sep?: boolean; s?: string; hi?: boolean; from?: Enter}> =
+({r, start, k, value, unit, dec, sep, s, hi, from = 'up'}) => {
   const f = useCurrentFrame(); const p = prog(f, start);
   return <div data-fit="pill" style={{position: 'absolute', left: r.x, top: r.y, width: r.w, height: r.h, borderRadius: 22, padding: '40px 44px', boxSizing: 'border-box', display: 'flex', flexDirection: 'column', justifyContent: 'center',
-    background: hi ? 'linear-gradient(160deg, rgba(80,60,28,0.7), rgba(36,28,14,0.65))' : 'rgba(255,255,255,0.06)',
-    border: hi ? '1px solid rgba(243,215,158,0.45)' : '1px solid rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)', ...enterStyle('up', p)}}>
+    background: hi ? 'linear-gradient(160deg, rgba(64,46,18,0.96), rgba(24,16,8,0.94))' : 'linear-gradient(160deg, rgba(32,28,24,0.94), rgba(14,12,10,0.92))',
+    border: hi ? '1px solid rgba(243,215,158,0.75)' : '1px solid rgba(255,255,255,0.28)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', ...enterStyle(from, p)}}>
     <div style={{fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.label, color: COLOR.goldHi, letterSpacing: 2}}>{k}</div>
     <div style={{fontFamily: FONT.num, fontSize: 68, color: COLOR.warm, marginTop: 18, lineHeight: 1.1, whiteSpace: 'nowrap'}}>
       <Count to={value} start={start + 6} dec={dec} sep={sep} /><span style={{fontFamily: FONT.body, fontWeight: 700, fontSize: TYPE.body, marginLeft: 10}}>{unit}</span>
