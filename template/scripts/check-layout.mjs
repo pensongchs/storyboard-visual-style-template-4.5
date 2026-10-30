@@ -12,6 +12,7 @@ import {TYPE, MIN_FONT} from '../src/style/tokens.ts';
 import {SHOTS} from '../src/demo/shots.ts';
 import {buildTimeline, F, TAIL} from '../src/sync/timeline.ts';
 import {SUB} from '../src/style/subtitle-tokens.ts';
+import {MG_LIB, MG_IDS} from '../src/style/mg-catalog.ts';
 import {ensureEpisode} from './episode.mjs';
 import {width} from './lib/subs.mjs';
 import {existsSync} from 'node:fs';
@@ -57,6 +58,19 @@ SHOTS.forEach((s, i) => {
   lastLayout.set(s.layout, i);
 });
 if (new Set(SHOTS.map((s) => s.motion).filter(Boolean)).size < Math.min(6, SHOTS.length)) errs.push('主动画种类不足 6 种');
+// 2c) 新 MG 动画库：同一种一期最多 max 次（默认 2），相邻镜不能相同，演示至少覆盖 8 种
+const mgCount = new Map();
+SHOTS.forEach((s, i) => {
+  if (!s.mg) return;
+  if (!MG_IDS.has(s.mg)) errs.push(`${s.id}: 未知 MG「${s.mg}」，只能用动画库里的 id`);
+  if (i && SHOTS[i - 1].mg === s.mg) errs.push(`${s.id}: 与上一镜用了同一种 MG「${s.mg}」`);
+  mgCount.set(s.mg, (mgCount.get(s.mg) ?? 0) + 1);
+});
+for (const [id, n] of mgCount) {
+  const max = MG_LIB.find((m) => m.id === id)?.max ?? 2;
+  if (n > max) errs.push(`MG「${id}」用了 ${n} 次，超过每期最多 ${max} 次`);
+}
+if (mgCount.size < 8) errs.push(`新 MG 只用了 ${mgCount.size} 种，一期演示至少要覆盖 8 种`);
 // 3) 城市中性：除 city 字段外，所有屏幕文字不得出现城市名
 const CITIES = '长沙|北京|上海|广州|深圳|杭州|成都|重庆|武汉|南京|西安|天津|苏州|郑州|合肥|青岛|宁波|厦门|福州|济南|昆明|南昌|贵阳|南宁|长春|沈阳|大连|哈尔滨|石家庄|太原|兰州|海口|佛山|东莞|无锡|株洲|湘潭';
 const cityRe = new RegExp(CITIES);
@@ -67,7 +81,7 @@ for (const s of SHOTS) textWalk(s, s.id);
 // 4) 字号下限（令牌 + 源码字面量）
 for (const [k, v] of Object.entries(TYPE)) if (v < MIN_FONT.any) errs.push(`TYPE.${k}=${v} < ${MIN_FONT.any}`);
 if (TYPE.body < MIN_FONT.body) errs.push(`TYPE.body=${TYPE.body} < ${MIN_FONT.body}`);
-for (const f of ['src/style/components.tsx', 'src/style/archetypes.tsx']) {
+for (const f of ['src/style/components.tsx', 'src/style/archetypes.tsx', 'src/style/mg-library.tsx']) {
   readFileSync(f, 'utf8').split('\n').forEach((line, i) => { for (const m of line.matchAll(/fontSize:\s*(\d+)/g)) if (+m[1] < MIN_FONT.any) errs.push(`${f}:${i + 1} fontSize ${m[1]} < ${MIN_FONT.any}`); });
 }
 // 6) 音画同步：音频存在 / 总帧 = 音频帧 + 片尾 / 每镜起点递增且 ≥1.2s / 每句字幕都落在某一镜 / 锚点可解析
@@ -130,4 +144,4 @@ if (process.argv.includes('--dom')) {
     console.log(`  字幕 #${k + 1} ✓ 中心 ${Math.round(cx)}，y ${Math.round(got.y)}–${Math.round(got.y + got.h)}，宽 ${Math.round(got.w)}`); }
 }
 if (errs.length) { console.log('✗ 发现问题:\n' + errs.join('\n')); process.exit(1); }
-console.log('✓ 全部通过：音画同步（总帧=音频+片尾、无空隙、字幕全覆盖、锚点有效）、字幕规格、贴栏线、无重叠、组距≥48、素材不重复、背景不糊、主动画轮换、无城市名、字号达标' + (process.argv.includes('--dom') ? '、填充率≤75%、行高≥1.3、无溢出' : ''));
+console.log('✓ 全部通过：音画同步（总帧=音频+片尾、无空隙、字幕全覆盖、锚点有效）、字幕规格、贴栏线、无重叠、组距≥48、素材不重复、背景不糊、主动画轮换、新 MG 每种≤2 且相邻不重复、无城市名、字号达标' + (process.argv.includes('--dom') ? '、填充率≤75%、行高≥1.3、无溢出' : ''));
